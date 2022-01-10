@@ -58,7 +58,9 @@ function buscar(){
                hallado = true;
                deleteRows();
                 element.productos.forEach(products => {
-                    total = total + (products.contador * products.precio);
+                    console.log(products.cantidad);
+                    console.log(products.precio);
+                    total = total + (products.cantidad * products.precio);
                     console.log(products.contador * products.precio);
                     
                     tabla.innerHTML += `
@@ -72,7 +74,7 @@ function buscar(){
 
                     `;
                 });
-                document.getElementById('totalCompra').innerHTML = `<p>Total: ${total}</p>`;
+                document.getElementById('totalCompra').innerHTML = `<p>Total: ${total} COP</p>`;
            }
            else{
                ++contador;
