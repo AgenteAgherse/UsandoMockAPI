@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="container-fluid" style="background-color: aquamarine">
-        <header style="text-align: center;" onclick="alerta()">
+        <header style="text-align: center;">
             <p>Hola<br>Bienvenido<br>a la tienda</p>
         </header>
 
@@ -23,21 +23,23 @@
         <div class="col-8">
             <fieldset>
                 <legend>Ingrese la opción que desea</legend>
-                <input type="radio" name="buscar" id="opcion" spellcheck="crearSeccionBusqueda()">
+                <input type="radio" name="opciones" id="buscar">
                 <label for="buscar">Buscar Productos Por Persona</label>
     
                 <br>
-                <input type="radio" name="agregar" id="opcion">
+                <input type="radio" name="opciones" id="agregar">
                 <label for="agregar">Agregar persona</label>
 
                 <br>
-                <button class="btn btn-dark espacio" onclick="crearSeccion()">Aceptar</button>
+                <button class="btn btn-dark espacio" onclick="generarMenu()">Aceptar</button>
             </fieldset>
         </div>
     </div>
         
         
-    
+    <!--DIVS QUE TIENEN LOS DIFERENTES CAMPOS QUE SE VAN A AGREGAR-->
+    <div class="container" id="campoCreacion"></div>
+
     <div id="campoBusqueda"></div>
 
 
