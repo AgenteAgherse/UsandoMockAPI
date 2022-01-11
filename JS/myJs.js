@@ -7,43 +7,39 @@ ________________________________________________________________________________
 const urlCostumers = 'https://61db14134593510017aff7f0.mockapi.io/api/v1/costumer';
 const urlProducts = 'https://61db14134593510017aff7f0.mockapi.io/api/v1/products';
 var estado = function cambiarEstado(para){
-    estado = {
+    return {
         method: para
     }
 };
+var productosParciales = [];
+
+//Me permitirá agregar un nuevo dato.
+async function appendDatatoJSON(url = '', data = {}){
+    const response = await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify(data)
+    });
+    alert('agregado!');
+    return response.json();
+}
 
 
+//OBTENER TODOS LOS PRODUCTOS SELECCIONADOS DENTRO DE LA 
 /*
 ______________________________________________________________________________________________________________
                                     MÉTODOS PARA LA REALIZACIÓN DE CONSULTAS.
                                                     NO ELIMINAR.
 ______________________________________________________________________________________________________________
 */
-
-/*Verificación de ID para no repetir la misma en caso que se esté agregando una persona*/
-verificar = function verificarId(id){
-    fetch(urlCostumers, estado('GET')).then(respuesta => respuesta.json()).then(obtenerDatos => {
-        obtenerDatos.forEach(element => {
-            console.log(element.id);
-            if(element.id == id){
-                verificar = true;
-            }
-        });
-    });
-    verificar = false;
-}
-
-/*Función para agregar a un comprador. Se verifica primero si el id de la persona no se ha encontrado con anterioridad*/
-function agregarComprador(){
-    let id = document.getElementById('agregarId').value;
-    
-    if(verificar){
-        alert('PERSONA YA AGREGADA CON ANTERIORIDAD!');
-    }
-}
-
-
-
 
 function buscar(){
     let identificacion = document.getElementById('id').value;
@@ -86,6 +82,40 @@ function buscar(){
     });
 }
 
+async function adicionarProductos(){
+    let productos = [];
+    const response = await fetch(urlProducts).then(response => response.json());
+    let data = {};
+    let cantidad = document.getElementsByClassName('cantidadElemento');
+    let i = 0;
+    response.forEach(element => {
+        if (cantidad[i].value != 0) {
+            data = {
+                "nombre": element.nombre,
+                "precio": element.precio,
+                "cantidad": element.cantidad,
+                "categoria": element.categoria,
+                "idproducto": element.idProducto
+            };
+            productos.push(data);
+        }
+        ++i;
+    });
+    console.log(productos);
+}
+
+function sobra(){
+    let productos = [];
+    let data = {};
+    let cantidad = document.getElementsByClassName('cantidadElemento');
+    let i = 0;
+    fetch(urlProducts).then(response => response.json()).then(respuesta => respuesta.forEach(element => {
+        
+        i += 1;
+        
+    }));
+    alert(productos.length);
+}
 
 //Método para eliminar las filas de la tabla
 function deleteRows(cuerpoTabla){
@@ -94,10 +124,7 @@ function deleteRows(cuerpoTabla){
     for(i = filas.length-1; i >= 0; i--){
         datosTabla.removeChild(filas[i]);
     }
-    alert('Done!');
 }
-
-
 
 /*
 ______________________________________________________________________________________________________________
@@ -115,8 +142,8 @@ function crearTablaProductos(){
                 <td>${element.nombre}</td>
                 <td>${element.precio}</td>
                 <td>${element.categoria}</td>
-                <td>
-                    <input type="number" name="${element.nombre}" id="${element.nombre}" placeholder="0">
+                <td id="contadorProductos">
+                    <input type="number" class="cantidadElemento" value=0>
                 </td>
             </tr>
         `;
@@ -138,6 +165,12 @@ function crearSeccionAgregarCliente(){
                 <div class="col-6">
                     <fieldset>
                         <legend style="text-align: center;">Ingrese a la nueva persona</legend>
+                        <label for="nombre">Ingrese el nombre: </label>
+                        <input type="text" name="nombre" id="name">
+                        <br>
+                        <br>
+                        <label for="telefono">Ingrese el teléfono</label>
+                        <input type="text" name="telefono" id="tel">
                         <table class="table">
                             <thead>
                                 <th class="col">ID</th>
@@ -155,7 +188,7 @@ function crearSeccionAgregarCliente(){
                         </table>
                         <br>
                         <div class="btn-group espacio" role="group">
-                            <button type="button" class="btn btn-dark">Agregar Persona</button>
+                            <button type="button" class="btn btn-dark" onclick="adicionarProductos()">Agregar Persona</button>
                             <button type="button" class="btn btn-light">Cancelar</button>
                         </div>
                         <div class="col"></div>
