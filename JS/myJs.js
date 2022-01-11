@@ -63,7 +63,7 @@ function buscar(){
                     
                     tabla.innerHTML += `
                         <tr>
-                            <td>${products.id}</td>
+                            <td>${products.idProducto}</td>
                             <td>${products.nombre}</td>
                             <td>${products.precio}</td>
                             <td>${products.cantidad}</td>
@@ -125,6 +125,12 @@ function crearTablaProductos(){
 
 function crearSeccionAgregarCliente(){
     const seccion = document.querySelector('#campoCreacion');
+
+    let agregado = document.querySelector('.contenedor_parcial_busqueda');
+    if(agregado != null){
+        agregado.parentNode.removeChild(agregado);
+    }
+
     seccion.innerHTML = `
     <div class="contenedor_parcial_agregar">
             <div class="row">
@@ -163,8 +169,14 @@ function crearSeccionAgregarCliente(){
 }
 /*CREADOR DE LA SECCIÓN DE BÚSQUEDA*/
 function crearSeccionBusquedaHistorial(){
-    const seccion = document.querySelector('#campoBusqueda');
-    seccion.innerHTML += `
+    let seccion = document.querySelector('#campoBusqueda');
+    //ELIMINAR VALOR
+    let agregado = document.querySelector('.contenedor_parcial_agregar');
+    if(agregado!=null){
+        agregado.parentNode.removeChild(agregado);
+    }
+
+    seccion.innerHTML = `
         <div class="contenedor_parcial_busqueda">
             <div class="row" style="background-color: azure;">
                 <div class="col-3"><p></p></div>
@@ -212,9 +224,9 @@ ________________________________________________________________________________
 
 function generarMenu(){
     if(document.getElementById('buscar').checked){
-        crearSeccionAgregarCliente();
+        crearSeccionBusquedaHistorial();
     }
     else if(document.getElementById('agregar').checked){
-        crearSeccionBusquedaHistorial();
+        crearSeccionAgregarCliente();
     }
 }
