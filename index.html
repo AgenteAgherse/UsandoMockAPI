@@ -31,16 +31,34 @@
                 <label for="agregar">Agregar persona</label>
 
                 <br>
+                <input type="radio" name="delete" id="delete">
+                <label for="delete">Eliminar un usuario a través de su identificación</label>
+
+                <br>
                 <button class="btn btn-dark espacio" onclick="generarMenu()">Aceptar</button>
             </fieldset>
         </div>
     </div>
         
-        
+
+
+    <div class="container" id="modificarElementos" style="margin-top: 10%;">
+        <div class="contenedor_parcial_eliminar">
+            <fieldset>
+                <legend style="text-align: center;">Eliminar Comprador</legend>
+                <label for="id">Ingrese identificación del usuario a eliminar: </label>
+                <div class="btn-group" role="group">
+                    <input type="number" name="id" id="deleteUser" value="0">
+                    <button class="btn btn-danger" onclick="deleteCostumer()">Eliminar Comprador</button>
+                </div>
+            </fieldset>
+        </div>
+    </div>
     <!--DIVS QUE TIENEN LOS DIFERENTES CAMPOS QUE SE VAN A AGREGAR-->
     <div class="container" id="campoCreacion"></div>
-    <div id="campoBusqueda"></div>
-
+    <div class="container" id="campoBusqueda"></div>
+    <div class="container" id="campoModificar"></div>
+    <div class="container" id="campoEliminar"></div>
 
     <!--SCRIPTS!!!-->
     <script src="JS/myJs.js"></script>

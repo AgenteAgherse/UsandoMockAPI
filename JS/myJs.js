@@ -26,11 +26,9 @@ ________________________________________________________________________________
 
 function buscar(){
     let identificacion = document.getElementById('id').value;
-    let hallado = false;
     let total = 0;
-    let contador = 0;
     const tabla = document.getElementById('cuerpoProductos');
-
+    deleteRows();
     fetch(urlCostumers, estado('GET')).then(respuesta => respuesta.json()).then(obtener => {
        obtener.forEach(element => {
            console.log(identificacion);
@@ -40,7 +38,7 @@ function buscar(){
                     total = total + (products.cantidad * products.precio);
                     
                     tabla.innerHTML += `
-                        <tr>
+                        <tr class="productoConsumidor">
                             <td>${products.idProducto}</td>
                             <td>${products.nombre}</td>
                             <td>${products.precio}</td>
@@ -52,13 +50,7 @@ function buscar(){
                 });
                 document.getElementById('totalCompra').innerHTML = `<p>Total: $ ${total} COP</p>`;
            }
-           else{
-               ++contador;
-           }
-
-           if(!hallado && contador == element.length){
-               alert('No hay una persona registrada con esta id');
-           }
+           
        },
        ); 
     });
@@ -93,7 +85,6 @@ function tomarGeneral(){
 }
 
 async function saveProducts(){
-    let productos = [];
     const response = await fetch(urlProducts).then(response => response.json());
     const responseCostumer = await fetch(urlCostumers).then(respone => respone.json());
     let long = 0;
@@ -111,16 +102,49 @@ async function saveProducts(){
                 "precio": element.precio,
                 "cantidad": element.cantidad,
                 "categoria": element.categoria,
+                "idProducto" : element.idProducto,
                 "costumerId": long
             };
             save(urlCostumers + '/' + long + '/products', data);
         }
         ++i;
     });
-    
+    alert('Su ID es: ' + long);
 }
 
+/*
+______________________________________________________________________________________________________________
+                                        MÉTODOS PARA ELIMINAR COMPRADOR.
+                                                    NO ELIMINAR.
+______________________________________________________________________________________________________________
+*/
 
+async function getProductsIdToDelete(idDel){
+    const responseProducts = await fetch(urlCostumers + '/' + idDel + '/products').then(response => response.json());
+    let arr = [];
+    responseProducts.forEach(element => {
+        arr.push(element.idProducto);
+    });
+    return arr;
+}
+async function deleteCostumer(){
+        let idDel = document.getElementById('deleteUser').value;
+        let valores = getProductsIdToDelete(idDel);        
+        (await valores).forEach(element => {
+            const responseProducts = fetch(urlCostumers + '/' + idDel + '/products/' + element,{
+                method: 'DELETE',
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+        }).then(response => response.json())});
+        const response = await fetch(urlCostumers + '/' + idDel, {
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"}
+        });
+        const data = await response.json();
+        alert('ELIMINADO');
+}
 /*
 ______________________________________________________________________________________________________________
                                     GENERADOR DE SECCIONES DEL DOCUMENTO HTML.
@@ -129,6 +153,7 @@ ________________________________________________________________________________
 */
 
 function crearTablaProductos(){
+    
     let tabla = document.querySelector('#generarProductos');
     fetch(urlProducts, estado('GET')).then(resultados => resultados.json()).then(generador => generador.forEach(element => {
         tabla.innerHTML += `
@@ -147,11 +172,7 @@ function crearTablaProductos(){
 
 function crearSeccionAgregarCliente(){
     const seccion = document.querySelector('#campoCreacion');
-
-    let agregado = document.querySelector('.contenedor_parcial_busqueda');
-    if(agregado != null){
-        agregado.parentNode.removeChild(agregado);
-    }
+    eliminarCampos(false, true, true, true);
 
     seccion.innerHTML = `
     <div class="contenedor_parcial_agregar">
@@ -198,11 +219,7 @@ function crearSeccionAgregarCliente(){
 /*CREADOR DE LA SECCIÓN DE BÚSQUEDA*/
 function crearSeccionBusquedaHistorial(){
     let seccion = document.querySelector('#campoBusqueda');
-    //ELIMINAR VALOR
-    let agregado = document.querySelector('.contenedor_parcial_agregar');
-    if(agregado!=null){
-        agregado.parentNode.removeChild(agregado);
-    }
+    eliminarCampos(true, false, true, true);
 
     seccion.innerHTML = `
         <div class="contenedor_parcial_busqueda">
@@ -240,7 +257,11 @@ function crearSeccionBusquedaHistorial(){
     `
 }
 
-
+function agregarSeccionEliminar(){
+    let seccion = document.getElementById('campoEliminar');
+    //Eliminar Campos
+    eliminarCampos(true, true, true, false);
+}
 
 
 /*
@@ -250,11 +271,36 @@ ________________________________________________________________________________
 ______________________________________________________________________________________________________________
 */
 
+function deleteRows(){
+    var eliminar = document.getElementById('cuerpoProductos');
+    var cantidadFilas = eliminar.getElementsByTagName('tr');
+    var cantidad = cantidadFilas.length;
+    for(i = cantidad-1; i>=0; i--){
+        eliminar.removeChild(cantidadFilas[i]);
+    }
+}
+
 function generarMenu(){
     if(document.getElementById('buscar').checked){
         crearSeccionBusquedaHistorial();
     }
     else if(document.getElementById('agregar').checked){
         crearSeccionAgregarCliente();
+    }
+}
+
+function eliminarCampos(agregar=false, mostrar=false, modificar=false, eliminar=false){
+    let agregado = document.querySelector('.contenedor_parcial_agregar');
+    let mostrado = document.querySelector('.contenedor_parcial_busqueda');
+    let eliminado = document.querySelector('.contenedor_parcial_eliminado');
+
+    if(agregar && agregado != null){
+        agregado.parentNode.removeChild(agregado);
+    }
+    if(mostrar && mostrado != null){
+        mostrado.parentNode.removeChild(mostrado);
+    }
+    if(eliminar && eliminado != null){
+        eliminado.parentNode.removeChild(eliminado);
     }
 }
