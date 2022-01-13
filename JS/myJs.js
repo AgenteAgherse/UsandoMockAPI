@@ -29,6 +29,7 @@ function buscar(){
     let total = 0;
     const tabla = document.getElementById('cuerpoProductos');
     deleteRows();
+    document.getElementById('totalCompra').innerHTML = `<p>Total: $0 COP</p>`;
     fetch(urlCostumers, estado('GET')).then(respuesta => respuesta.json()).then(obtener => {
        obtener.forEach(element => {
            console.log(identificacion);
@@ -258,9 +259,22 @@ function crearSeccionBusquedaHistorial(){
 }
 
 function agregarSeccionEliminar(){
-    let seccion = document.getElementById('campoEliminar');
+    let seccion = document.querySelector('#campoEliminar');
     //Eliminar Campos
     eliminarCampos(true, true, true, false);
+
+    seccion.innerHTML += `
+        <div class="contenedor_parcial_eliminar">
+        <fieldset>
+            <legend style="text-align: center;">Eliminar Comprador</legend>
+            <label for="id">Ingrese identificación del usuario a eliminar: </label>
+            <div class="btn-group" role="group">
+                <input type="number" name="id" id="deleteUser" value="0">
+                <button class="btn btn-danger" onclick="deleteCostumer()">Eliminar Comprador</button>
+            </div>
+        </fieldset>
+        </div>
+    `;
 }
 
 
@@ -287,12 +301,15 @@ function generarMenu(){
     else if(document.getElementById('agregar').checked){
         crearSeccionAgregarCliente();
     }
+    else if(document.getElementById('delete').checked){
+        agregarSeccionEliminar();
+    }
 }
 
 function eliminarCampos(agregar=false, mostrar=false, modificar=false, eliminar=false){
     let agregado = document.querySelector('.contenedor_parcial_agregar');
     let mostrado = document.querySelector('.contenedor_parcial_busqueda');
-    let eliminado = document.querySelector('.contenedor_parcial_eliminado');
+    let eliminado = document.querySelector('.contenedor_parcial_eliminar');
 
     if(agregar && agregado != null){
         agregado.parentNode.removeChild(agregado);
