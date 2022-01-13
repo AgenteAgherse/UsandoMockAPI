@@ -11,26 +11,9 @@ var estado = function cambiarEstado(para){
         method: para
     }
 };
-var productosParciales = [];
 
 //Me permitirá agregar un nuevo dato.
-async function appendDatatoJSON(url = '', data = {}){
-    const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify(data)
-    });
-    alert('agregado!');
-    return response.json();
-}
+
 
 
 //OBTENER TODOS LOS PRODUCTOS SELECCIONADOS DENTRO DE LA 
@@ -53,7 +36,6 @@ function buscar(){
            console.log(identificacion);
            if(element.id == identificacion){
                hallado = true;
-               deleteRows('cuerpoProductos');
                 element.productos.forEach(products => {                    
                     total = total + (products.cantidad * products.precio);
                     
@@ -82,12 +64,46 @@ function buscar(){
     });
 }
 
-async function adicionarProductos(){
+
+/*
+______________________________________________________________________________________________________________
+                                            MÉTODOS AGREGAR AL DOCUMENTO.
+                                                    NO ELIMINAR.
+______________________________________________________________________________________________________________
+*/
+
+async function save(url = '', data = {}){
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    return response.json();
+}
+
+function tomarGeneral(){
+    let persona = {
+        nombre: document.getElementById('name').value,
+        telefono: document.getElementById('tel').value,
+    }
+    save(urlCostumers, persona);
+    saveProducts();
+}
+
+async function saveProducts(){
     let productos = [];
     const response = await fetch(urlProducts).then(response => response.json());
+    const responseCostumer = await fetch(urlCostumers).then(respone => respone.json());
+    let long = 0;
+    responseCostumer.forEach(element => {
+        ++long;
+    });
     let data = {};
     let cantidad = document.getElementsByClassName('cantidadElemento');
     let i = 0;
+    console.log(long);
     response.forEach(element => {
         if (cantidad[i].value != 0) {
             data = {
@@ -95,36 +111,15 @@ async function adicionarProductos(){
                 "precio": element.precio,
                 "cantidad": element.cantidad,
                 "categoria": element.categoria,
-                "idproducto": element.idProducto
+                "costumerId": long
             };
-            productos.push(data);
+            save(urlCostumers + '/' + long + '/products', data);
         }
         ++i;
     });
-    console.log(productos);
+    
 }
 
-function sobra(){
-    let productos = [];
-    let data = {};
-    let cantidad = document.getElementsByClassName('cantidadElemento');
-    let i = 0;
-    fetch(urlProducts).then(response => response.json()).then(respuesta => respuesta.forEach(element => {
-        
-        i += 1;
-        
-    }));
-    alert(productos.length);
-}
-
-//Método para eliminar las filas de la tabla
-function deleteRows(cuerpoTabla){
-    const datosTabla = document.getElementById(cuerpoTabla);
-    const filas = datosTabla.getElementsByTagName('tr');
-    for(i = filas.length-1; i >= 0; i--){
-        datosTabla.removeChild(filas[i]);
-    }
-}
 
 /*
 ______________________________________________________________________________________________________________
@@ -188,7 +183,7 @@ function crearSeccionAgregarCliente(){
                         </table>
                         <br>
                         <div class="btn-group espacio" role="group">
-                            <button type="button" class="btn btn-dark" onclick="adicionarProductos()">Agregar Persona</button>
+                            <button type="button" class="btn btn-dark" onclick="tomarGeneral()">Agregar Persona</button>
                             <button type="button" class="btn btn-light">Cancelar</button>
                         </div>
                         <div class="col"></div>
