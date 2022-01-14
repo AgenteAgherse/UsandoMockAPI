@@ -28,11 +28,27 @@ function buscar(){
     let identificacion = document.getElementById('id').value;
     let total = 0;
     const tabla = document.getElementById('cuerpoProductos');
+    const info = document.getElementById('infoCliente');
     deleteRows();
+    //infoCliente
+    fetch(urlCostumers).then(response => response.json()).then(respuesta => {
+        respuesta.forEach(element => {
+            console.log(identificacion + '/' + element.id);
+            if(identificacion == element.id){
+                info.innerHTML = `
+                    <div class="row" style="text-align: center;">
+                        <p><strong>Información</strong></p>
+                        <p>Nombre: ${element.nombre}</p>
+                        <p>Teléfono: ${element.telefono}</p>
+                    </div>
+                `;
+            }
+        })
+    });
     document.getElementById('totalCompra').innerHTML = `<p>Total: $0 COP</p>`;
     fetch(urlCostumers, estado('GET')).then(respuesta => respuesta.json()).then(obtener => {
+        
        obtener.forEach(element => {
-           console.log(identificacion);
            if(element.id == identificacion){
                hallado = true;
                 element.productos.forEach(products => {                    
@@ -40,7 +56,6 @@ function buscar(){
                     
                     tabla.innerHTML += `
                         <tr class="productoConsumidor">
-                            <td>${products.idProducto}</td>
                             <td>${products.nombre}</td>
                             <td>${products.precio}</td>
                             <td>${products.cantidad}</td>
@@ -113,6 +128,34 @@ async function saveProducts(){
     alert('Su ID es: ' + long);
 }
 
+
+/*
+______________________________________________________________________________________________________________
+                                        MÉTODOS PARA CAMBIAR INFORMACIÓN DEL COMPRADOR.
+                                                    NO ELIMINAR.
+______________________________________________________________________________________________________________
+*/
+async function modificarInfo(data = {}){
+    let id = document.querySelector('#idModificacion').value;
+    console.log(data);
+    const response = fetch(urlCostumers + '/' + id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json;'
+        },
+        body: JSON.stringify(data)
+    }).then(res => res.json()).then(datos => console.log(datos));
+    alert('INFORMACIÓN GUARDADA');
+}
+
+saveNewData = function(){
+    saveNewData = {
+        nombre: document.getElementById('nombreModificacion').value,
+        telefono: document.getElementById('telefonoModificacion').value,
+        id: document.getElementById('idModificacion').value
+    }
+    modificarInfo(saveNewData);
+}
 /*
 ______________________________________________________________________________________________________________
                                         MÉTODOS PARA ELIMINAR COMPRADOR.
@@ -159,7 +202,6 @@ function crearTablaProductos(){
     fetch(urlProducts, estado('GET')).then(resultados => resultados.json()).then(generador => generador.forEach(element => {
         tabla.innerHTML += `
             <tr>
-                <td>${element.idProducto}</td>
                 <td>${element.nombre}</td>
                 <td>${element.precio}</td>
                 <td>${element.categoria}</td>
@@ -190,7 +232,6 @@ function crearSeccionAgregarCliente(){
                         <input type="text" name="telefono" id="tel">
                         <table class="table">
                             <thead>
-                                <th class="col">ID</th>
                                 <th class="col">Nombre</th>
                                 <th class="col">Precio</th>
                                 <th class="col">Categoría</th>
@@ -232,11 +273,11 @@ function crearSeccionBusquedaHistorial(){
                 </div>
                 <div class="col-3"><p></p></div>
             </div>
+            <div class="row" id="infoCliente"></div>
             <div class="row">
-                <div class="col-12">
+                <div class="col-10">
                     <table class="table" id="tablaProductos">
                         <thead>
-                            <th class="col">ID</th>
                             <th class="col">Nombre</th> 
                             <th class="col">Precio</th>
                             <th class="col">Cantidad</th>
@@ -277,7 +318,40 @@ function agregarSeccionEliminar(){
     `;
 }
 
+function agregarSeccionModificar(){
+    let seccion = document.querySelector('#campoModificar');
+    eliminarCampos(true,true,false,true);
 
+    seccion.innerHTML += `
+        <div class="container campo_parcial_modificar">
+            <fieldset>
+                <legend style="text-align: center;">Modificación de Usuario</legend>
+                <div class="row">
+                    <div class="col-10">
+                        <div class="btn btn-group" role="group">
+                            <label for="id">Ingrese el ID de la persona a modificar informacion:</label>
+                            <input type="text" name="id" id="idModificacion">
+                            <button class="btn btn-success" id="btnHab" onclick="habilitar()">Verificar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <label for="name">Ingrese el nuevo nombre</label>
+                        <input type="text" name="name" id="nombreModificacion" disabled>
+                    </div>
+                    <div class="col-5">
+                        <label for="name">Ingrese el nuevo teléfono</label>
+                        <input type="tel" name="tel" id="telefonoModificacion" disabled>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-success" id="btnMod" disabled onclick="saveNewData()">Modificar</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    `;
+}
 /*
 ______________________________________________________________________________________________________________
                                                 GENERADOR DE MENÚ.
@@ -304,13 +378,35 @@ function generarMenu(){
     else if(document.getElementById('delete').checked){
         agregarSeccionEliminar();
     }
+    else if(document.getElementById('modificar').checked){
+        agregarSeccionModificar();
+    }
+}
+
+async function habilitar(){
+    const verificar = await fetch(urlCostumers).then(response => response.json());
+    let id = document.getElementById('idModificacion').value;
+    console.log(id);
+    verificar.forEach(element =>{
+        console.log(element.id);
+        if(element.id == id){
+            let nom = document.querySelector('#nombreModificacion');
+            let tel = document.querySelector('#telefonoModificacion');
+            let btnMod = document.querySelector('#btnMod');
+            let btnHab = document.querySelector('#btnHab');
+            nom.disabled = false;
+            tel.disabled = false;
+            btnMod.disabled = false;
+            btnHab.disabled = true;
+        }
+    });
 }
 
 function eliminarCampos(agregar=false, mostrar=false, modificar=false, eliminar=false){
     let agregado = document.querySelector('.contenedor_parcial_agregar');
     let mostrado = document.querySelector('.contenedor_parcial_busqueda');
     let eliminado = document.querySelector('.contenedor_parcial_eliminar');
-
+    let modificado = document.querySelector('.campo_parcial_modificar');
     if(agregar && agregado != null){
         agregado.parentNode.removeChild(agregado);
     }
@@ -319,5 +415,8 @@ function eliminarCampos(agregar=false, mostrar=false, modificar=false, eliminar=
     }
     if(eliminar && eliminado != null){
         eliminado.parentNode.removeChild(eliminado);
+    }
+    if(modificar && modificado != null){
+        modificado.parentNode.removeChild(modificado);
     }
 }
