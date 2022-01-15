@@ -136,23 +136,28 @@ ________________________________________________________________________________
 ______________________________________________________________________________________________________________
 */
 async function modificarInfo(data = {}){
-    let id = document.querySelector('#idModificacion').value;
+    let id = document.getElementById('idModificacion').value;
     console.log(data);
-    const response = fetch(urlCostumers + '/' + id, {
+    console.log(id.length);
+    console.log(id);
+    let urlParcial = urlCostumers + '/' + id;
+    console.log(urlParcial);
+    const response = await fetch(urlParcial, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json;'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-    }).then(res => res.json()).then(datos => console.log(datos));
+    });
     alert('INFORMACIÓN GUARDADA');
+    return response.json();
 }
 
 saveNewData = function(){
     saveNewData = {
-        nombre: document.getElementById('nombreModificacion').value,
-        telefono: document.getElementById('telefonoModificacion').value,
-        id: document.getElementById('idModificacion').value
+        "nombre": document.getElementById('nombreModificacion').value,
+        "telefono": document.getElementById('telefonoModificacion').value,
+        "id": document.getElementById('idModificacion').value
     }
     modificarInfo(saveNewData);
 }
@@ -318,6 +323,7 @@ function agregarSeccionEliminar(){
     `;
 }
 
+
 function agregarSeccionModificar(){
     let seccion = document.querySelector('#campoModificar');
     eliminarCampos(true,true,false,true);
@@ -337,8 +343,8 @@ function agregarSeccionModificar(){
                 </div>
                 <div class="row">
                     <div class="col-5">
-                        <label for="name">Ingrese el nuevo nombre</label>
-                        <input type="text" name="name" id="nombreModificacion" disabled>
+                        <label for="nombre">Ingrese el nuevo nombre</label>
+                        <input type="text" name="nombre" id="nombreModificacion" disabled>
                     </div>
                     <div class="col-5">
                         <label for="name">Ingrese el nuevo teléfono</label>
@@ -386,9 +392,7 @@ function generarMenu(){
 async function habilitar(){
     const verificar = await fetch(urlCostumers).then(response => response.json());
     let id = document.getElementById('idModificacion').value;
-    console.log(id);
     verificar.forEach(element =>{
-        console.log(element.id);
         if(element.id == id){
             let nom = document.querySelector('#nombreModificacion');
             let tel = document.querySelector('#telefonoModificacion');
